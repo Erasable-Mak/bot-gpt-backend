@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: BOT GPT Backend API
+  version: 0.1.0
+servers:
+  - url: http://127.0.0.1:5000/api
+
+paths:
+  /users:
+    post:
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username]
+              properties:
+                username: { type: string }
+                email: { type: string }
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '409': { description: Username exists }
+        '400': { description: Bad request }
+
+  /users/{user_id}/conversations:
+    get:
+      summary: List conversations for a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Conversation' }
+
+  /documents:
+    post:
+      summary: Create document (register)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, title]
+              properties:
+                user_id: { type: integer }
+                title: { type: string }
+                uri: { type: string }
+      responses:
+        '201':
+          description: Document created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Document' }
+        '404': { description: User not found }
+        '400': { description: Bad request }
+
+  /users/{user_id}/documents:
+    get:
+      summary: List documents for a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Document' }
+
+  /conversations:
+    post:
+      summary: Create conversation (open_chat or rag)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, message]
+              properties:
+                user_id: { type: integer }
+                message: { type: string }
+                mode:
+                  type: string
+                  enum: [open_chat, rag]
+                  default: open_chat
+                document_ids:
+                  type: array
+                  items: { type: string }
+      responses:
+        '201':
+          description: Conversation created with messages
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationWithMessages' }
+        '404': { description: User or document not found }
+        '400': { description: Bad request }
+
+  /conversations/{conversation_id}:
+    get:
+      summary: Get conversation with messages
+      parameters:
+        - in: path
+          name: conversation_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Conversation detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationWithMessages' }
+        '404': { description: Not found }
+
+    delete:
+      summary: Delete conversation
+      parameters:
+        - in: path
+          name: conversation_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Deleted }
+        '404': { description: Not found }
+
+  /conversations/{conversation_id}/messages:
+    post:
+      summary: Add message to conversation
+      parameters:
+        - in: path
+          name: conversation_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string }
+      responses:
+        '200':
+          description: Conversation with updated messages
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationWithMessages' }
+        '404': { description: Conversation not found }
+        '400': { description: Bad request }
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+
+    Document:
+      type: object
+      properties:
+        id: { type: string }
+        user_id: { type: integer }
+        title: { type: string }
+        uri: { type: string }
+        created_at: { type: string, format: date-time }
+
+    Message:
+      type: object
+      properties:
+        id: { type: integer }
+        conversation_id: { type: string }
+        content: { type: string }
+        role:
+          type: string
+          enum: [user, assistant]
+        created_at: { type: string, format: date-time }
+        tokens_used: { type: integer }
+        metadata:
+          type: object
+          additionalProperties: true
+
+    Conversation:
+      type: object
+      properties:
+        id: { type: string }
+        user_id: { type: integer }
+        title: { type: string }
+        mode:
+          type: string
+          enum: [open_chat, rag]
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        document_ids:
+          type: array
+          items: { type: string }
+
+    ConversationWithMessages:
+      allOf:
+        - $ref: '#/components/schemas/Conversation'
+        - type: object
+          properties:
+            messages:
+              type: array
+              items: { $ref: '#/components/schemas/Message' }
