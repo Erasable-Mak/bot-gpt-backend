@@ -12,6 +12,9 @@ A Flask-based backend for the BOT GPT conversational AI platform.
 ## Setup
 
 ```bash
+
+IMPORTANT NOTICE: RUNS on python 3.11.9
+
 1. Clone the repository:
 git clone REPO_GIT_UTL
 cd bot-gpt-backend
@@ -24,16 +27,26 @@ venv\Scripts\Activate.ps1
 3. Install dependencies:
 pip install -r requirements.txt
 
-3. setup .env in /app folder, alternative .env variable values can be fetched from AWS Secrets as per ENV:
+4. Code change needed in 1 file if using GROQ and not stub:
+In file `bot-gpt-backend\app\config.py`
+uncomment line 13 and comment line 14
+LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'groq').lower()
+# LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'stub').lower()
+
+4. setup .env in /app folder, alternative .env variable values can be fetched from AWS Secrets as per ENV:
 LLM_PROVIDER=groq
 GROQ_API_KEY=YOUR_SECRET_API_KEY
 GROQ_MODEL=llama-3.1-8b-instant
 DATABASE_URL=sqlite:///botgpt.db
 
-4. Run Application:
+5. Run Application and set env variables if .env file variables don't work it's a classic issue:
+$env:LLM_PROVIDER="groq"
+$env:GROQ_API_KEY="YOUR_SECRET_API_KEY"
+$env:GROQ_MODEL="llama-3.1-8b-instant"
+$env:DATABASE_URL="sqlite:///botgpt.db"
 python run.py
 
-5. Check application functioning:
+6. Check application functioning:
 a) Create a user
 
 Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:5000/api/users" `
@@ -71,5 +84,3 @@ Remember User_id and field are subjected to change.
 
 Note: Currently this project is using "@bp.route" which can be change to "connexion" "swagger/schema.yml" file that is already present and main file will be functional. 
 
-
-IMPORTANT NOTICE: RUNS on python 3.11.9
