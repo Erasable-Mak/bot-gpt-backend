@@ -85,7 +85,7 @@ Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/api/conversations/<con
 h) Get all documents for a user
 Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/api/users/7/documents"
 
-i) Get full conversation (detail)
+i) Delete a conversation
 Invoke-RestMethod -Method Delete -Uri "http://127.0.0.1:5000/api/conversations/<conversation_id>"
 
 Remember User_id and field are subjected to change.
