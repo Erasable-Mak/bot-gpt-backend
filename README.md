@@ -79,6 +79,12 @@ Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:5000/api/conversations/<co
 f) List conversations
 Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/api/users/3/conversations"
 
+g) Get full conversation (detail)
+Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/api/conversations/<conversation_id>"
+
+h) Get full conversation (detail)
+Invoke-RestMethod -Method Delete -Uri "http://127.0.0.1:5000/api/conversations/<conversation_id>"
+
 Remember User_id and field are subjected to change.
 
 
