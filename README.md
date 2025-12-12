@@ -82,7 +82,7 @@ Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/api/users/3/conversati
 g) Get full conversation (detail)
 Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/api/conversations/<conversation_id>"
 
-h) Get all documents for a user (you implemented it but didn’t call it)
+h) Get all documents for a user
 Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/api/users/7/documents"
 
 i) Get full conversation (detail)
